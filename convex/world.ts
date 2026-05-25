@@ -164,6 +164,44 @@ export const leaveWorld = mutation({
   },
 });
 
+export const updateAgentStatus = mutation({
+  args: {
+    agentName: v.string(),
+    description: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const worldStatus = await ctx.db
+      .query('worldStatus')
+      .filter((q) => q.eq(q.field('isDefault'), true))
+      .first();
+    if (!worldStatus) return;
+    await insertInput(ctx, worldStatus.worldId, 'updateAgentActivity', {
+      agentName: args.agentName,
+      description: args.description,
+    });
+    await ctx.db.insert('agentLogs', {
+      worldId: worldStatus.worldId,
+      playerName: args.agentName,
+      task: args.description,
+      timestamp: Date.now(),
+    });
+  },
+});
+
+export const getAgentLogs = query({
+  args: {
+    worldId: v.id('worlds'),
+    playerName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('agentLogs')
+      .withIndex('playerName', (q) => q.eq('worldId', args.worldId).eq('playerName', args.playerName))
+      .order('desc')
+      .take(20); // Get last 20 tasks
+  },
+});
+
 export const sendWorldInput = mutation({
   args: {
     engineId: v.id('engines'),

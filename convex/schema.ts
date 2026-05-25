@@ -21,6 +21,13 @@ export default defineSchema({
     .index('conversationId', ['worldId', 'conversationId'])
     .index('messageUuid', ['conversationId', 'messageUuid']),
 
+  agentLogs: defineTable({
+    worldId: v.id('worlds'),
+    playerName: v.string(),
+    task: v.string(),
+    timestamp: v.number(),
+  }).index('playerName', ['worldId', 'playerName']),
+
   ...agentTables,
   ...aiTownTables,
   ...engineTables,

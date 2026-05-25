@@ -192,17 +192,7 @@ export class Agent {
         const tooLongDeadline = started + MAX_CONVERSATION_DURATION;
         if (tooLongDeadline < now || conversation.numMessages > MAX_CONVERSATION_MESSAGES) {
           console.log(`${player.id} leaving conversation with ${otherPlayer.id}.`);
-          const messageUuid = crypto.randomUUID();
-          conversation.setIsTyping(now, player, messageUuid);
-          this.startOperation(game, now, 'agentGenerateMessage', {
-            worldId: game.worldId,
-            playerId: player.id,
-            agentId: this.id,
-            conversationId: conversation.id,
-            otherPlayerId: otherPlayer.id,
-            messageUuid,
-            type: 'leave',
-          });
+          conversation.leave(game, now, player);
           return;
         }
         // Wait for the awkward deadline if we sent the last message.

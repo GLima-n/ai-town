@@ -276,6 +276,41 @@ export const conversationInputs = {
     },
   }),
 
+  // God Mode: Force a conversation between two players, ending any existing conversations they might be in.
+  forceConversation: inputHandler({
+    args: {
+      playerId,
+      invitee: playerId,
+    },
+    handler: (game: Game, now: number, args): GameId<'conversations'> => {
+      const playerId = parseGameId('players', args.playerId);
+      const player = game.world.players.get(playerId);
+      if (!player) {
+        throw new Error(`Invalid player ID: ${playerId}`);
+      }
+      const inviteeId = parseGameId('players', args.invitee);
+      const invitee = game.world.players.get(inviteeId);
+      if (!invitee) {
+        throw new Error(`Invalid player ID: ${inviteeId}`);
+      }
+      
+      // Force end any existing conversations for both players
+      for (const conversation of game.world.conversations.values()) {
+        if (conversation.participants.has(player.id) || conversation.participants.has(invitee.id)) {
+          console.log(`Force ending conversation ${conversation.id} for God Mode meeting`);
+          conversation.stop(game, now);
+        }
+      }
+
+      console.log(`Force starting conversation ${playerId} ${inviteeId}...`);
+      const { conversationId, error } = Conversation.start(game, now, player, invitee);
+      if (!conversationId) {
+        throw new Error(error);
+      }
+      return conversationId;
+    },
+  }),
+
   startTyping: inputHandler({
     args: {
       playerId,

@@ -307,4 +307,27 @@ export const playerInputs = {
       return null;
     },
   }),
+  updateAgentActivity: inputHandler({
+    args: {
+      agentName: v.string(),
+      description: v.string(),
+    },
+    handler: (game, now, args) => {
+      // Find the player by name in playerDescriptions
+      const playerDesc = [...game.playerDescriptions.values()].find((d) => d.name.toLowerCase().includes(args.agentName.toLowerCase()));
+      if (!playerDesc) {
+         console.warn("Could not find agent: " + args.agentName);
+         return null;
+      }
+      const player = game.world.players.get(playerDesc.playerId);
+      if (player) {
+         player.activity = {
+           description: args.description,
+           until: Date.now() + 1000 * 60 * 60 * 24, // 24 hours from real time
+         };
+         stopPlayer(player);
+      }
+      return null;
+    }
+  }),
 };
