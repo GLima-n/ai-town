@@ -47,7 +47,7 @@ export default function Game() {
       <div className="w-full h-full grid grid-rows-[240px_1fr] lg:grid-rows-[1fr] lg:grid-cols-[1fr_auto] lg:grow game-frame">
         {/* Game area */}
         <div className="relative overflow-hidden bg-brown-900" ref={gameWrapperRef}>
-          {isAgentManagerOpen && <AgentManager game={game} onClose={() => setIsAgentManagerOpen(false)} />}
+          {isAgentManagerOpen && <AgentManager game={game} worldId={worldId} engineId={engineId} onClose={() => setIsAgentManagerOpen(false)} />}
           <div className="absolute inset-0">
             <div className="container">
               <Stage width={width} height={height} options={{ backgroundColor: 0x7ab5ff }}>
